@@ -6,16 +6,16 @@
 
 import ugame
 import stage
+import time 
+import random 
 
 import constants
 
 # function that holds the menu
 def menu_scene():
-
-
     
     # images to import
-    image_bank_background = stage.Bank.from_bmp16("space_aliens_background.bmp")
+    image_bank_mt_background = stage.Bank.from_bmp16("mt_game_studio.bmp")
 
     # add text 
     text = []
@@ -30,7 +30,7 @@ def menu_scene():
     text.append(text2)
     
     # set background to first image and set size
-    background = stage.Grid(image_bank_background, 10, 8)
+    background = stage.Grid(image_bank_mt_background, 10, 8)
   
     # create stage and set game to 60fps
     game = stage.Stage(ugame.display, 60)
@@ -51,10 +51,65 @@ def menu_scene():
         # redraw sprites
         game.tick()
 
+# function that holds the spaslh screen
+def splash_scene():
+
+    # get sound ready
+    coin_sound = open("coin.wav", 'rb')
+    sound = ugame.audio
+    sound.stop()
+    sound.mute(False)
+    sound.play(coin_sound)
+    
+    # images to import
+    image_bank_mt_background = stage.Bank.from_bmp16("mt_game_studio.bmp")
+    
+    # set background to first image and set size
+    background = stage.Grid(image_bank_mt_background, 10, 8)
+
+    background.tile(2, 2, 0)  # blank white
+    background.tile(3, 2, 1)
+    background.tile(4, 2, 2)
+    background.tile(5, 2, 3)
+    background.tile(6, 2, 4)
+    background.tile(7, 2, 0)  # blank white
+
+    background.tile(2, 3, 0)  # blank white
+    background.tile(3, 3, 5)
+    background.tile(4, 3, 6)
+    background.tile(5, 3, 7)
+    background.tile(6, 3, 8)
+    background.tile(7, 3, 0)  # blank white
+
+    background.tile(2, 4, 0)  # blank white
+    background.tile(3, 4, 9)
+    background.tile(4, 4, 10)
+    background.tile(5, 4, 11)
+    background.tile(6, 4, 12)
+    background.tile(7, 4, 0)  # blank white
+
+    background.tile(2, 5, 0)  # blank white
+    background.tile(3, 5, 0)
+    background.tile(4, 5, 13)
+    background.tile(5, 5, 14)
+    background.tile(6, 5, 0)
+    background.tile(7, 5, 0)  # blank white
+  
+    # create stage and set game to 60fps
+    game = stage.Stage(ugame.display, 60)
+    # set layers of all sprites
+    game.layers = [background]
+    # render all sprites
+    game.render_block()
+    
+    # wait for 2 seconds
+    while True:
+        time.sleep(2.0)
+        menu_scene()
+
 # function that holds the main game
 def game_scene():
 
-    
     
     # images to import
     image_bank_background = stage.Bank.from_bmp16("space_aliens_background.bmp")
@@ -74,6 +129,11 @@ def game_scene():
     
     # set background to first image and set size
     background = stage.Grid(image_bank_background, 10, 8)
+
+    for x_location in range(constants.SCREEN_GRID_X):
+        for y_location in range(constants.SCREEN_GRID_Y):
+            tile_picked = random.randint(1, 3)
+            background.tile(x_location, y_location, tile_picked)
     
     ship = stage.Sprite(image_bank_sprites, 5, 75, constants.SCREEN_Y - (2 * constants.SPRITE_SIZE))
 
@@ -138,4 +198,4 @@ def game_scene():
         game.tick()
 
 if __name__ == "__main__":
-    menu_scene()
+    splash_scene()
