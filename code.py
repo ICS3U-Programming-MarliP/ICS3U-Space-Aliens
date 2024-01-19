@@ -218,9 +218,15 @@ def game_scene():
                 ship.move(0 , ship.y)
                 
         if keys & ugame.K_UP != 0:
-            pass
+            if ship.x <= constants.SCREEN_X - constants.SPRITE_SIZE:
+                ship.move(ship.x, ship.y - 1)
+            else:
+                ship.move(constants.SCREEN_X - constants.SPRITE_SIZE, ship.y)
         if keys & ugame.K_DOWN != 0:
-            pass
+            if ship.x <= constants.SCREEN_X - constants.SPRITE_SIZE:
+                ship.move(ship.x, ship.y + 1)
+            else:
+                ship.move(constants.SCREEN_X - constants.SPRITE_SIZE, ship.y)
 
         # update game logic play sound if a is pressed
         if a_button == constants.button_state["button_just_pressed"]:
@@ -284,6 +290,12 @@ def game_scene():
                     sound.play(crash_sound)
                     time.sleep(3.0)
                     game_over_scene(score)
+        
+        # if game is won
+        if score > 10:
+            time.sleep(3.0)
+            game_win_scene(score)
+
         # redraw sprite list
         game.render_sprites(lasers + [ship] + aliens)
         game.tick()
@@ -310,6 +322,50 @@ def game_over_scene(final_score):
     text2 = stage.Text(width=29, height=14, font=None, palette=constants.RED_PALETTE, buffer=None)
     text2.move(43, 60)
     text2.text("Game over!")
+    text.append(text2)
+
+    text3 = stage.Text(width=29, height=14, font=None, palette=constants.RED_PALETTE, buffer=None)
+    text3.move(32,110)
+    text3.text("Press select!")
+    text.append(text3)  
+
+    # background for stage
+    game = stage.Stage(ugame.display, constants.FPS)
+    game.layers = text + [background]
+    game.render_block()
+
+    # game loop
+    while True:
+        keys = ugame.buttons.get_pressed()
+
+        # select button pressed
+        if keys & ugame.K_SELECT != 0:
+            supervisor.reload()
+            
+        # update game logic
+        game.tick()
+
+def game_win_scene(final_score):
+
+    # turn off audio from game
+    sound = ugame.audio.stop()
+
+    # image banks
+    image_bank_2 = stage.Bank.from_bmp16("mt_game_studio.bmp")
+
+    # sets the background to image 0
+    background = stage.Grid(image_bank_2, constants.SCREEN_GRID_X, constants.SCREEN_GRID_Y)
+
+    # add text objects
+    text = []
+    text1 = stage.Text(width=29, height=14, font=None, palette=constants.RED_PALETTE, buffer=None)
+    text1.move(22, 20)
+    text1.text("Final Score: {:0>2d}".format(final_score))
+    text.append(text1)
+
+    text2 = stage.Text(width=29, height=14, font=None, palette=constants.RED_PALETTE, buffer=None)
+    text2.move(43, 60)
+    text2.text("You win!")
     text.append(text2)
 
     text3 = stage.Text(width=29, height=14, font=None, palette=constants.RED_PALETTE, buffer=None)
